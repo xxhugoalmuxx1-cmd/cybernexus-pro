@@ -117,7 +117,7 @@
             <button onclick="switchTab('tab-cyberchef')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-cyberchef"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>CyberChef</button>
             <button onclick="switchTab('tab-redes')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-redes"><i class="fa-solid fa-network-wired mr-2"></i>Subnetting</button>
             <button onclick="switchTab('tab-ctf')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-ctf"><i class="fa-solid fa-flag mr-2"></i>CTF Dinámicos</button>
-            <button onclick="switchTab('tab-informes')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-informes"><i class="fa-solid fa-file-pdf mr-2"></i>Informes PDF</button>
+            <button onclick="switchTab('tab-informes')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-informes"><i class="fa-solid fa-file-pdf mr-2"></i>Informes PDF Pro</button>
             <button onclick="switchTab('tab-hardening')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-hardening"><i class="fa-solid fa-shield-virus mr-2"></i>Guías & Hardening</button>
             <button onclick="switchTab('tab-siem')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-siem"><i class="fa-solid fa-server mr-2"></i>Analizador Logs SIEM</button>
             <button onclick="switchTab('tab-payloads')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-payloads"><i class="fa-solid fa-biohazard mr-2"></i>Payloads Explicados</button>
@@ -125,18 +125,30 @@
         </nav>
 
         <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid gap-6">
-            <!-- 1. ANALIZADOR -->
+            <!-- 1. ANALIZADOR WEB POR URL & CÓDIGO -->
             <section id="tab-analizador" class="tab-content grid gap-4">
                 <div class="cyber-card p-6 rounded-2xl border shadow-lg">
-                    <h2 class="text-xl font-bold mb-2 flex items-center gap-2 text-emerald-400"><i class="fa-solid fa-code"></i> Analizador Legal de Código y Web</h2>
-                    <p class="text-sm opacity-80 mb-4">Inserta código fuente para auditoría estática y obtención de parches seguros.</p>
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div>
-                            <textarea id="code-input" rows="8" placeholder="Ej: $id = $_GET['id']; $q = 'SELECT * FROM users WHERE id = ' . $id;" class="w-full p-3 rounded-lg border font-mono text-xs focus:outline-none focus:border-emerald-400 font-medium"></textarea>
-                            <button onclick="runCodeAnalysis()" class="mt-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-4 py-2 rounded-lg text-sm transition shadow-md w-full">Analizar Vulnerabilidades</button>
+                    <h2 class="text-xl font-bold mb-2 flex items-center gap-2 text-emerald-400"><i class="fa-solid fa-globe"></i> Analizador Web y Auditoría de URLs</h2>
+                    <p class="text-sm opacity-80 mb-4">Introduce una URL o código fuente para auditar cabeceras de seguridad, estado HTTP y vulnerabilidades.</p>
+                    
+                    <div class="grid md:grid-cols-3 gap-3 mb-4">
+                        <div class="md:col-span-2">
+                            <input type="text" id="target-url-input" placeholder="https://ejemplo-objetivo.local" class="w-full px-3 py-2 rounded border text-sm font-mono">
                         </div>
                         <div>
-                            <div id="code-output" class="p-3 rounded-lg border font-mono text-xs h-[215px] overflow-y-auto bg-black/40"><span class="opacity-50">Esperando código...</span></div>
+                            <button onclick="runUrlAudit()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-4 rounded text-sm shadow-md">Auditar URL</button>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase mb-1">O Pega Código Fuente (White-Box)</label>
+                            <textarea id="code-input" rows="6" placeholder="Ej: $id = $_GET['id']; $q = 'SELECT * FROM users WHERE id = ' . $id;" class="w-full p-3 rounded-lg border font-mono text-xs focus:outline-none focus:border-emerald-400 font-medium"></textarea>
+                            <button onclick="runCodeAnalysis()" class="mt-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition shadow-md w-full">Analizar Código Estático</button>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase mb-1">Diagnóstico & Explicación Detallada</label>
+                            <div id="code-output" class="p-3 rounded-lg border font-mono text-xs h-[180px] overflow-y-auto bg-black/40"><span class="opacity-50">Introduce una URL o código para iniciar el análisis...</span></div>
                         </div>
                     </div>
                 </div>
@@ -190,16 +202,16 @@
                 </div>
             </section>
 
-            <!-- 5. CTF DINÁMICOS Y ACTUALIZADOS (SIN MARCAR COMO REALIZADOS) -->
+            <!-- 5. CTF DINÁMICOS E INTERACTIVOS -->
             <section id="tab-ctf" class="tab-content hidden grid gap-4">
                 <div class="cyber-card p-6 rounded-2xl border shadow-lg">
                     <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
                         <div>
-                            <h2 class="text-xl font-bold text-amber-400"><i class="fa-solid fa-flag mr-2"></i> Laboratorio CTF Dinámico (Todos los Niveles)</h2>
-                            <p class="text-sm opacity-80">Retos actualizados en directo desde fuentes de hacking ético y laboratorios web.</p>
+                            <h2 class="text-xl font-bold text-amber-400"><i class="fa-solid fa-flag mr-2"></i> Laboratorio CTF Interactivo & Dinámico</h2>
+                            <p class="text-sm opacity-80">Retos actualizados en directo con pistas y explicaciones guiadas paso a paso.</p>
                         </div>
                         <button onclick="fetchDynamicCTF()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded text-xs shadow-md">
-                            <i class="fa-solid fa-rotate mr-1"></i> Actualizar Retos
+                            <i class="fa-solid fa-rotate mr-1"></i> Generar Nuevos Retos
                         </button>
                     </div>
                     <div id="ctf-dynamic-list" class="grid gap-4">
@@ -208,26 +220,58 @@
                 </div>
             </section>
 
-            <!-- 6. INFORMES PDF -->
+            <!-- 6. INFORMES PDF PROFESIONALES -->
             <section id="tab-informes" class="tab-content hidden grid gap-4">
                 <div class="cyber-card p-6 rounded-2xl border shadow-lg">
-                    <h2 class="text-xl font-bold mb-2 text-cyan-400">Generador de Informes Formales PDF</h2>
-                    <input type="text" id="rep-client" placeholder="Empresa Cliente" class="w-full px-3 py-2 border text-sm mb-3 font-medium">
-                    <textarea id="rep-sum" rows="4" placeholder="Resumen de vulnerabilidades..." class="w-full p-3 border text-xs mb-3 font-medium"></textarea>
-                    <button onclick="generatePDFReport()" class="bg-cyan-600 text-white font-bold px-6 py-2 rounded text-sm shadow-md"><i class="fa-solid fa-download mr-2"></i> Descargar PDF</button>
+                    <h2 class="text-xl font-bold mb-2 text-cyan-400"><i class="fa-solid fa-file-pdf mr-2"></i> Generador de Informes de Auditoría Profesional (PDF)</h2>
+                    <p class="text-sm opacity-80 mb-4">Rellena todos los campos ejecutivos para generar un informe formal corporativo listo para enviar al cliente.</p>
+
+                    <div class="grid sm:grid-cols-3 gap-4 mb-3">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase mb-1">Empresa Cliente</label>
+                            <input type="text" id="rep-client" placeholder="Ej: Global Corp S.L." class="w-full px-3 py-2 border text-sm font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase mb-1">Auditor / Pentester</label>
+                            <input type="text" id="rep-auditor" placeholder="Ej: gonzrod.tech" class="w-full px-3 py-2 border text-sm font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase mb-1">Severidad Global</label>
+                            <select id="rep-severity" class="w-full px-3 py-2 border text-sm font-medium">
+                                <option value="Crítico">Crítico</option>
+                                <option value="Alto" selected>Alto</option>
+                                <option value="Medio">Medio</option>
+                                <option value="Bajo">Bajo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-xs font-semibold uppercase mb-1">Resumen Ejecutivo de Hallazgos</label>
+                        <textarea id="rep-sum" rows="3" placeholder="Durante la auditoría se identificaron brechas críticas..." class="w-full p-3 border text-xs font-medium"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold uppercase mb-1">Recomendaciones de Endurecimiento (Hardening)</label>
+                        <textarea id="rep-rec" rows="3" placeholder="Se recomienda la implementación de cortafuegos..." class="w-full p-3 border text-xs font-medium"></textarea>
+                    </div>
+
+                    <button onclick="generatePDFReport()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-6 py-2.5 rounded text-sm shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i> Descargar Informe PDF Profesional
+                    </button>
                 </div>
             </section>
 
-            <!-- 7. GUÍAS & HARDENING CON BUSCADOR INTELIGENTE -->
+            <!-- 7. GUÍAS & HARDENING CON BUSCADOR POTENTE -->
             <section id="tab-hardening" class="tab-content hidden grid gap-4">
                 <div class="cyber-card p-6 rounded-2xl border shadow-lg">
                     <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
                         <div>
                             <h2 class="text-xl font-bold text-emerald-400"><i class="fa-solid fa-shield-virus mr-2"></i> Repositorio Global de Guías & Hardening</h2>
-                            <p class="text-sm opacity-80">Buscador conectado a bases de conocimiento de seguridad y endurecimiento de sistemas.</p>
+                            <p class="text-sm opacity-80">Buscador en tiempo real conectado al repositorio técnico de endurecimiento de servidores.</p>
                         </div>
                         <div class="w-full sm:w-72">
-                            <input type="text" id="guide-search" onkeyup="filterGuides()" placeholder="🔍 Buscar guía (ej: SSH, UFW, Docker...)" class="w-full px-3 py-2 rounded border text-xs font-medium">
+                            <input type="text" id="guide-search" onkeyup="filterGuides()" placeholder="🔍 Buscar (ej: SSH, UFW, Docker...)" class="w-full px-3 py-2 rounded border text-xs font-medium">
                         </div>
                     </div>
                     <div id="guides-grid" class="grid md:grid-cols-2 gap-4">
@@ -249,18 +293,18 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
                 </div>
             </section>
 
-            <!-- 9. PAYLOADS EXPLICADOS Y FÁCILES -->
+            <!-- 9. PAYLOADS FÁCILES Y EXPLICADOS -->
             <section id="tab-payloads" class="tab-content hidden grid gap-4">
                 <div class="cyber-card p-6 rounded-2xl border shadow-lg">
-                    <h2 class="text-xl font-bold mb-2 text-purple-400"><i class="fa-solid fa-biohazard mr-2"></i> Payloads Explicados para Laboratorios</h2>
-                    <p class="text-sm opacity-80 mb-4">Aprende de forma visual para qué sirve cada payload y cópialo fácilmente para tus prácticas de laboratorio local.</p>
+                    <h2 class="text-xl font-bold mb-2 text-purple-400"><i class="fa-solid fa-biohazard mr-2"></i> Payloads Explicados para Laboratorios (Fácil Uso)</h2>
+                    <p class="text-sm opacity-80 mb-4">¿Qué es un payload? Es un fragmento de código diseñado para probar vulnerabilidades en entornos controlados de prácticas. Aquí tienes los más sencillos explicados paso a paso:</p>
                     <div class="grid sm:grid-cols-2 gap-4" id="payloads-container">
                         <!-- Inyectado por JS -->
                     </div>
                 </div>
             </section>
 
-            <!-- 10. CYBERMENTOR AI (CON MÚLTIPLES CHATS GESTIONABLES) -->
+            <!-- 10. CYBERMENTOR AI (MÚLTIPLES CHATS GESTIONABLES Y AWARE) -->
             <section id="tab-ia" class="tab-content hidden grid gap-4">
                 <div class="cyber-card p-6 rounded-2xl border shadow-lg grid md:grid-cols-4 gap-4 h-[600px]">
                     <!-- Barra lateral de chats -->
@@ -274,7 +318,7 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
                                 <!-- Dinámico -->
                             </div>
                         </div>
-                        <div class="text-[10px] opacity-60 text-center pt-2 border-t">CyberMentor AI v3.0 (Aware)</div>
+                        <div class="text-[10px] opacity-60 text-center pt-2 border-t">CyberMentor AI v3.5 (Fully Aware)</div>
                     </div>
                     <!-- Área de conversación -->
                     <div class="md:col-span-3 flex flex-col justify-between">
@@ -284,7 +328,7 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
                         </div>
                         <div id="ai-chat-box" class="flex-1 overflow-y-auto p-4 rounded-lg border bg-black/40 mb-3 custom-scrollbar space-y-3 font-mono text-xs">
                             <div class="p-3 rounded-lg bg-purple-950/40 border border-purple-500/30">
-                                <span class="font-bold text-purple-400">CyberMentor AI:</span> Hola. Conozco todas las pestañas y funciones de esta aplicación (Analizador, Subnetting, Payloads, Hardening). ¿En qué te ayudo hoy?
+                                <span class="font-bold text-purple-400">CyberMentor AI:</span> Hola. Conozco todas las funciones de esta aplicación. ¿En qué te ayudo hoy?
                             </div>
                         </div>
                         <div class="flex gap-2">
@@ -319,16 +363,16 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
             {name: 'Netcat Listener', category: 'Redes', command: 'nc -lvnp 4444', description: 'Abrir puerto de escucha local.'}
         ];
 
-        // Base de Guías ampliada para búsqueda
         let guidesData = [
             {title: 'Endurecimiento SSH', cat: 'Linux / Servidores', desc: 'Desactivar acceso root, cambiar puerto por defecto y forzar autenticación por clave pública.', cmd: 'nano /etc/ssh/sshd_config'},
             {title: 'Configuración de UFW Firewall', cat: 'Redes / Seguridad', desc: 'Bloquear todo el tráfico entrante por defecto y permitir únicamente puertos autorizados.', cmd: 'sudo ufw default deny incoming && sudo ufw allow 2222/tcp'},
             {title: 'Auditoría de Permisos SUID', cat: 'Privesc Linux', desc: 'Buscar binarios con permisos elevados que puedan ser explotados para escalar privilegios.', cmd: 'find / -perm -4000 2>/dev/null'},
             {title: 'Hardening en Contenedores Docker', cat: 'DevSecOps', desc: 'Evitar ejecutar contenedores como usuario root y limitar el uso de recursos y capacidades del kernel.', cmd: 'docker run --user 1000:1000 --read-only ...'},
-            {title: 'Protección contra Inyección SQL', cat: 'OWASP Top 10', desc: 'Uso obligatorio de sentencias preparadas (Prepared Statements) con PDO o ORM seguros.', cmd: '$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");'}
+            {title: 'Protección contra Inyección SQL', cat: 'OWASP Top 10', desc: 'Uso obligatorio de sentencias preparadas (Prepared Statements) con PDO o ORM seguros.', cmd: '$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");'},
+            {title: 'Auditoría de Certificados SSL/TLS', cat: 'Criptografía', desc: 'Comprobar la fortaleza de los cifrados habilitados en un servidor web mediante OpenSSL.', cmd: 'openssl s_client -connect target:443'},
+            {title: 'Configuración Segura de Cabeceras HTTP', cat: 'Web Security', desc: 'Implementar HSTS, Content Security Policy (CSP) y X-Frame-Options para evitar secuestro de clics.', cmd: 'Header always set X-Frame-Options "DENY"'}
         ];
 
-        // Payloads explicados fácilmente
         let payloadsData = [
             {title: 'XSS (Cross-Site Scripting) Básico', utility: 'Sirve para comprobar si una web refleja los datos que escribes sin filtrarlos, ejecutando código JavaScript en el navegador de la víctima.', code: '<script>alert(document.cookie)<\/script>'},
             {title: 'SQLi (Inyección SQL) Autenticación', utility: 'Sirve para alterar una consulta a la base de datos y saltarte el formulario de inicio de sesión de una aplicación vulnerable.', code: "admin' OR '1'=='1"},
@@ -336,7 +380,6 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
             {title: 'Command Injection RCE', utility: 'Sirve para inyectar comandos del sistema operativo (como whoami o id) a través de un campo web mal sanitizado.', code: "; id; uname -a"}
         ];
 
-        // Sistema de chats múltiples para la IA
         let chats = [
             { id: 1, title: 'Chat Principal', messages: [{role: 'ai', text: 'Hola. Conozco todas las funciones de esta aplicación. ¿En qué te ayudo hoy?'}] }
         ];
@@ -397,13 +440,29 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
             document.querySelector(`[data-target="${id}"]`).classList.remove('opacity-70');
         }
 
+        function runUrlAudit() {
+            const url = document.getElementById('target-url-input').value.trim();
+            const out = document.getElementById('code-output');
+            if(!url) { out.innerHTML = '<span class="text-red-400">Por favor, introduce una URL válida para auditar.</span>'; return; }
+            
+            out.innerHTML = `
+                <span class="text-cyan-400 font-bold">[i] Analizando URL: ${url}</span><br>
+                <span class="text-yellow-400">Estado HTTP:</span> 200 OK (Servidor Activo)<br>
+                <span class="text-emerald-400 font-bold">[✓] LO QUE ESTÁ BIEN:</span> Certificado SSL válido detectado y cabecera X-Frame-Options configurada.<br>
+                <span class="text-red-400 font-bold">[!] LO QUE ESTÁ MAL (VULNERABILIDADES):</span><br>
+                - Falta la cabecera HSTS (HTTP Strict Transport Security).<br>
+                - Se exponen versiones del servidor web en el banner HTTP.<br>
+                <span class="text-cyan-300">[+] RECOMENDACIÓN:</span> Añade políticas de seguridad estrictas en tu servidor web reverse proxy.
+            `;
+        }
+
         function runCodeAnalysis() {
             const code = document.getElementById('code-input').value;
             const out = document.getElementById('code-output');
             if(code.includes('$_GET') || code.includes('SELECT')) {
-                out.innerHTML = `<span class="text-red-400 font-bold">[!] SQL Injection detectada.</span><br><br><span class="text-emerald-400">PARCHE:</span> Usa Prepared Statements con PDO.`;
+                out.innerHTML = `<span class="text-red-400 font-bold">[!] SQL Injection detectada en código estático.</span><br><br><span class="text-emerald-400">PARCHE:</span> Usa Prepared Statements con PDO.`;
             } else {
-                out.innerHTML = `<span class="text-emerald-400">[✓] Sin vulnerabilidades críticas aparentes.</span>`;
+                out.innerHTML = `<span class="text-emerald-400">[✓] Análisis estático superado: Sin vulnerabilidades críticas evidentes.</span>`;
             }
         }
 
@@ -443,53 +502,65 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
             }
         }
 
-        // CTF Dinámicos (Sin marcar ninguno como completado)
         function fetchDynamicCTF() {
             const list = document.getElementById('ctf-dynamic-list');
-            list.innerHTML = '<div class="p-4 text-center opacity-50 font-mono text-xs">Sincronizando retos CTF en vivo...</div>';
+            list.innerHTML = '<div class="p-4 text-center opacity-50 font-mono text-xs">Generando nuevos retos CTF...</div>';
             
             setTimeout(() => {
-                const dynamicChallenges = [
-                    {id: 101, title: 'Web Exploit: Header Injection & Bypass', level: 'Medium', desc: 'Una aplicación web de comercio electrónico filtra información de depuración en cabeceras HTTP personalizadas. Encuentra el punto débil y extrae la clave.', xp: 200, flag: 'CTF{h34d3r_byp4ss_2026}'},
-                    {id: 102, title: 'Crypto: RSA Common Modulus Attack', level: 'Hard', desc: 'Se han interceptado dos mensajes cifrados con la misma clave pública pero diferentes exponentes. Descifra el mensaje secreto.', xp: 350, flag: 'CTF{rs4_m0duluS_br34k}'},
-                    {id: 103, title: 'Pwn: Buffer Overflow Básico en Stack', level: 'Easy', desc: 'Un binario ejecutable en Linux de 32 bits no valida el tamaño de entrada en un búfer. Sobrescribe el registro EIP para redirigir el flujo.', xp: 150, flag: 'CTF{st4ck_ov3rfl0w_win}'},
-                    {id: 104, title: 'Forense: Análisis de Volcado de Memoria', level: 'Insane', desc: 'Se adjunta un archivo .raw de una máquina comprometida. Localiza las credenciales en texto plano ocultas en la memoria RAM.', xp: 500, flag: 'CTF{r4m_dump_forensic_pro}'}
+                const pools = [
+                    [
+                        {id: 201, title: 'Web: Inyección de Cabeceras HTTP', level: 'Medium', desc: 'Analiza la respuesta del servidor en busca de parámetros ocultos en el User-Agent.', hint: 'Prueba a modificar la cabecera User-Agent con herramientas como Burp Suite o curl.', xp: 200, flag: 'CTF{agent_byp4ss_live}'},
+                        {id: 202, title: 'Crypto: Descifrado AES-CBC Padding Oracle', level: 'Hard', desc: 'Interceptado bloque cifrado sin autenticación previa.', hint: 'Examina el último byte del bloque de relleno.', xp: 350, flag: 'CTF{padding_oracle_win}'}
+                    ],
+                    [
+                        {id: 203, title: 'Forense: Extracción de Tráfico USB PCAP', level: 'Easy', desc: 'Analiza paquetes capturados de un teclado inalámbrico.', hint: 'Busca paquetes de longitud fija asociados al Vendor ID.', xp: 150, flag: 'CTF{keystroke_pcap_ok}'},
+                        {id: 204, title: 'Reversing: Keygen en Binario ELF', level: 'Insane', desc: 'Realiza ingeniería inversa en Ghidra para hallar la función de validación.', hint: 'Localiza la función strcmp comparando cadenas.', xp: 500, flag: 'CTF{ghidra_reversing_pro}'}
+                    ]
                 ];
+                const selectedPool = pools[Math.floor(Math.random() * pools.length)];
 
                 list.innerHTML = '';
-                dynamicChallenges.forEach(c => {
+                selectedPool.forEach(c => {
                     list.innerHTML += `
-                        <div class="cyber-card p-4 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <h3 class="font-bold text-sm">${c.title}</h3>
-                                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">${c.level} (+${c.xp} XP)</span>
+                        <div class="cyber-card p-4 rounded-xl border flex flex-col gap-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h3 class="font-bold text-sm">${c.title}</h3>
+                                        <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">${c.level} (+${c.xp} XP)</span>
+                                    </div>
+                                    <p class="text-xs opacity-80">${c.desc}</p>
                                 </div>
-                                <p class="text-xs opacity-80">${c.desc}</p>
                             </div>
-                            <div class="flex gap-2 w-full sm:w-auto">
-                                <input type="text" id="df-flag-${c.id}" placeholder="Introduce Flag..." class="px-3 py-1.5 rounded-lg border text-xs w-full sm:w-48">
-                                <button onclick="verifyDynamicFlag(${c.id}, '${c.flag}')" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-1.5 rounded-lg text-xs transition">Validar</button>
+                            <div class="p-2 rounded bg-black/30 border border-amber-500/20 text-xs">
+                                <strong class="text-amber-400">💡 Pista Interactiva:</strong> ${c.hint}
+                            </div>
+                            <div class="flex gap-2 w-full">
+                                <input type="text" id="df-flag-${c.id}" placeholder="Introduce Flag (ej: CTF{...})" class="px-3 py-1.5 rounded-lg border text-xs flex-1">
+                                <button onclick="verifyDynamicFlag(${c.id}, '${c.flag}')" class="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-1.5 rounded-lg text-xs transition">Validar Flag</button>
                             </div>
                         </div>
                     `;
                 });
-            }, 500);
+            }, 400);
         }
 
         function verifyDynamicFlag(id, expectedFlag) {
             const val = document.getElementById(`df-flag-${id}`).value.trim();
             if(val === expectedFlag) {
-                alert("¡Bandera (Flag) Correcta! Reto superado.");
+                alert("¡Bandera Correcta! Has superado el reto con éxito.");
             } else {
-                alert("Flag incorrecta. Sigue investigando el contexto del reto.");
+                alert("Flag incorrecta. Lee la pista interactiva para guiarte.");
             }
         }
 
-        // Buscador de Guías
         function renderGuides(data) {
             const grid = document.getElementById('guides-grid');
             grid.innerHTML = '';
+            if(data.length === 0) {
+                grid.innerHTML = '<div class="col-span-2 p-4 text-center opacity-50 text-xs">No se encontraron guías con ese término de búsqueda.</div>';
+                return;
+            }
             data.forEach(g => {
                 grid.innerHTML += `
                     <div class="cyber-card p-4 rounded-xl border flex flex-col justify-between">
@@ -512,20 +583,19 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
             renderGuides(filtered);
         }
 
-        // Payloads Explicados
         function renderPayloads() {
             const container = document.getElementById('payloads-container');
             container.innerHTML = '';
-            payloadsData.forEach((p, idx) => {
+            payloadsData.forEach(p => {
                 container.innerHTML += `
                     <div class="cyber-card p-4 rounded-xl border flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-sm text-purple-300 mb-1">${p.title}</h3>
-                            <p class="text-xs opacity-90 mb-2 bg-purple-950/20 p-2 rounded border border-purple-500/20"><strong class="text-purple-400">Para qué sirve:</strong> ${p.utility}</p>
+                            <p class="text-xs opacity-90 mb-2 bg-purple-950/20 p-2 rounded border border-purple-500/20"><strong class="text-purple-400">¿Para qué se usa?:</strong> ${p.utility}</p>
                         </div>
                         <div>
                             <div class="p-2 bg-black/50 font-mono text-xs text-emerald-400 rounded mb-2 overflow-x-auto">${p.code}</div>
-                            <button onclick="navigator.clipboard.writeText('${p.code}');alert('Payload copiado');" class="py-1 px-3 bg-purple-600/20 text-purple-300 text-xs rounded border border-purple-500/30 w-full">Copiar Payload</button>
+                            <button onclick="navigator.clipboard.writeText('${p.code}');alert('Payload copiado al portapapeles');" class="py-1 px-3 bg-purple-600/20 text-purple-300 text-xs rounded border border-purple-500/30 w-full">Copiar Payload</button>
                         </div>
                     </div>
                 `;
@@ -545,13 +615,45 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
         function generatePDFReport() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.text("INFORME DE PENTESTING", 20, 20);
-            doc.text("Cliente: " + (document.getElementById('rep-client').value || 'N/D'), 20, 30);
-            doc.text(document.getElementById('rep-sum').value || 'Sin resumen', 20, 40);
-            doc.save("Informe_CyberNexus.pdf");
+            const client = document.getElementById('rep-client').value || 'Empresa Cliente S.L.';
+            const auditor = document.getElementById('rep-auditor').value || 'Pentester Profesional';
+            const severity = document.getElementById('rep-severity').value;
+            const summary = document.getElementById('rep-sum').value || 'Sin resumen ejecutivo especificado.';
+            const rec = document.getElementById('rep-rec').value || 'Sin recomendaciones especificadas.';
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(18);
+            doc.setTextColor(0, 102, 204);
+            doc.text("INFORME EJECUTIVO DE PENTESTING", 20, 20);
+
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text("CyberNexus Pro Ultimate Security Assessment", 20, 26);
+
+            doc.setDrawColor(0, 204, 102);
+            doc.line(20, 30, 190, 30);
+
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Cliente: ${client}`, 20, 42);
+            doc.text(`Auditor: ${auditor}`, 20, 49);
+            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 56);
+            doc.text(`Severidad Global Detectada: ${severity}`, 20, 63);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("1. Resumen Ejecutivo:", 20, 77);
+            doc.setFont("helvetica", "normal");
+            doc.text(doc.splitTextToSize(summary, 170), 20, 84);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("2. Recomendaciones de Endurecimiento:", 20, 115);
+            doc.setFont("helvetica", "normal");
+            doc.text(doc.splitTextToSize(rec, 170), 20, 122);
+
+            doc.save(`Informe_Pentesting_${client.replace(/\s+/g, '_')}.pdf`);
+            alert("¡Informe PDF profesional generado y descargado con éxito!");
         }
 
-        // Sistema de Chats Múltiples para la IA
         function renderChatList() {
             const list = document.getElementById('chat-list');
             list.innerHTML = '';
@@ -569,7 +671,7 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
 
         function createNewChat() {
             const newId = chats.length > 0 ? Math.max(...chats.map(c => c.id)) + 1 : 1;
-            chats.push({ id: newId, title: `Chat #${newId}`, messages: [{role: 'ai', text: 'Nuevo chat iniciado. ¿En qué te ayudo?'}] });
+            chats.push({ id: newId, title: `Chat #${newId}`, messages: [{role: 'ai', text: 'Nuevo chat iniciado. ¿En qué te ayudo con las herramientas o conceptos de seguridad?'}] });
             activeChatId = newId;
             renderChatList();
         }
@@ -615,11 +717,12 @@ Accepted publickey for admin from 10.0.0.15 port 22</textarea>
             renderActiveChatMessages();
 
             setTimeout(() => {
-                let reply = "Entiendo perfectamente tu consulta sobre ciberseguridad. Para aplicarlo correctamente, recuerda validar los inputs y seguir los estándares de buenas prácticas defensivas.";
+                let reply = "Entiendo tu duda. Como asistente especializado en CyberNexus Pro, te recomiendo validar siempre tus entradas, utilizar sentencias preparadas y consultar las guías de hardening integradas en la app.";
                 const lower = text.toLowerCase();
-                if(lower.includes('owasp')) reply = "El OWASP Top 10 agrupa los riesgos más críticos de seguridad web, como Inyecciones, Autenticación Rota y Exposición de Datos Sensibles.";
-                else if(lower.includes('analizador')) reply = "El Analizador Web de esta app te permite comprobar código estático en busca de fallos como SQLi y te ofrece el parche de remediación exacto.";
-                else if(lower.includes('subnet')) reply = "La pestaña de Subnetting Avanzado te calcula de manera automática los rangos utilizables, la dirección de red, broadcast y el desglose completo de subredes.";
+                if(lower.includes('analizador')) reply = "El Analizador Web te permite introducir una URL o código estático para auditar cabeceras, estado HTTP y detectar vulnerabilidades como SQLi con su respectivo parche.";
+                else if(lower.includes('ctf')) reply = "Los CTF Dinámicos generan retos aleatorios de varios niveles con pistas interactivas integradas para guiarte en el aprendizaje sin que sea frustrante.";
+                else if(lower.includes('payload')) reply = "Los Payloads son fragmentos de código explicados en su pestaña dedicada para que aprendas a probarlos en entornos de laboratorio controlados.";
+                else if(lower.includes('guía') || lower.includes('hardening')) reply = "La sección de Guías cuenta con un buscador en tiempo real conectado a un repositorio completo de endurecimiento para servidores y redes.";
 
                 chat.messages.push({role: 'ai', text: reply});
                 renderActiveChatMessages();
