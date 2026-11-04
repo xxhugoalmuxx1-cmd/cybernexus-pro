@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberNexus Pro Ultimate | Cybersecurity Suite</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: { dark: '#0a0f1d', card: '#111827', border: '#1f293d', neon: '#00ff66', blue: '#00f0ff', purple: '#9d00ff' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
+        html:not(.dark) body { background-color: #f8fafc; color: #0f172a; }
+        html:not(.dark) .cyber-card { background-color: #ffffff; border-color: #cbd5e1; color: #0f172a; }
+        html:not(.dark) h1, html:not(.dark) h2, html:not(.dark) h3, html:not(.dark) h4, html:not(.dark) span, html:not(.dark) p, html:not(.dark) label { color: #0f172a !important; }
+        html:not(.dark) input, html:not(.dark) select, html:not(.dark) textarea { background-color: #f1f5f9 !important; color: #0f172a !important; border-color: #94a3b8 !important; }
+        html.dark body { background-color: #0a0f1d; color: #f3f4f6; }
+        html.dark .cyber-card { background-color: #111827; border-color: #1f293d; color: #f3f4f6; }
+        .neon-border { border: 1px solid rgba(0, 255, 102, 0.4); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00ff66; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-black">
+
+    <!-- PANTALLA DE INICIO DE SESIÓN / SUPABASE (BLOQUEANTE SI NO ESTÁS LOGEADO) -->
+    <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md">
+        <div class="cyber-card p-8 rounded-2xl w-full max-w-md shadow-2xl border neon-border">
+            <div class="text-center mb-6">
+                <i class="fa-solid fa-shield-halved text-4xl text-emerald-400 mb-2"></i>
+                <h2 class="text-2xl font-bold tracking-wider">CYBERNEXUS PRO</h2>
+                <p class="text-sm opacity-80 mt-1">Acceso Protegido - Autenticación Requerida</p>
+            </div>
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase mb-1">URL del Proyecto Supabase</label>
+                    <input type="text" id="supabase-url" placeholder="https://tu-proyecto.supabase.co" class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:border-emerald-400" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase mb-1">Anon Key de Supabase</label>
+                    <input type="password" id="supabase-key" placeholder="eyJhbGciOiJIUzI1NiIsIn..." class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:border-emerald-400" required>
+                </div>
+                <hr class="border-gray-700 my-2">
+                <div>
+                    <label class="block text-xs font-semibold uppercase mb-1">Correo Electrónico</label>
+                    <input type="email" id="auth-email" placeholder="usuario@ciberseguridad.local" class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:border-emerald-400" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase mb-1">Contraseña</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:border-emerald-400" required>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" id="btn-login" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-4 rounded-lg text-sm transition shadow-lg">Iniciar Sesión</button>
+                    <button type="button" id="btn-signup" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-lg text-sm transition">Registrarse</button>
+                </div>
+                <p id="auth-error" class="text-xs text-red-400 text-center mt-2 hidden"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL (BLOQUEADA HASTA LOGIN) -->
+    <div id="app-container" class="opacity-30 pointer-events-none filter blur-sm transition duration-500 flex flex-col min-h-screen">
+        <header class="cyber-card border-b px-4 py-3 sticky top-0 z-40 backdrop-blur-md bg-opacity-90 flex flex-wrap justify-between items-center shadow-md">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-black font-black text-xl shadow-lg">
+                    <i class="fa-solid fa-terminal"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-wide flex items-center gap-2">
+                        CyberNexus Pro <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">Ultimate</span>
+                    </h1>
+                    <p class="text-xs opacity-70">Plataforma Profesional de Ciberseguridad</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 mt-2 sm:mt-0">
+                <div id="user-badge" class="text-xs px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield text-emerald-400"></i>
+                    <span id="current-user-email">Autenticado</span>
+                </div>
+                <button onclick="toggleTheme()" class="w-9 h-9 rounded-lg cyber-card border flex items-center justify-center hover:scale-105 transition" title="Cambiar Tema">
+                    <i id="theme-icon" class="fa-solid fa-sun text-amber-400"></i>
+                </button>
+                <button onclick="logoutSupabase()" class="w-9 h-9 rounded-lg bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center hover:bg-red-500/30 transition" title="Cerrar Sesión">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+        </header>
+
+        <nav class="cyber-card border-b px-4 overflow-x-auto custom-scrollbar flex space-x-2 py-2 sticky top-[65px] z-30">
+            <button onclick="switchTab('tab-analizador')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition bg-emerald-500 text-black shadow-md" data-target="tab-analizador"><i class="fa-solid fa-magnifying-glass-chart mr-2"></i>Analizador Web & Código</button>
+            <button onclick="switchTab('tab-arsenal')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-arsenal"><i class="fa-solid fa-toolbox mr-2"></i>Arsenal & Custom</button>
+            <button onclick="switchTab('tab-cyberchef')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-cyberchef"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>CyberChef Local</button>
+            <button onclick="switchTab('tab-redes')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-redes"><i class="fa-solid fa-network-wired mr-2"></i>Subnetting Avanzado</button>
+            <button onclick="switchTab('tab-ctf')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-ctf"><i class="fa-solid fa-flag mr-2"></i>Laboratorio CTF</button>
+            <button onclick="switchTab('tab-informes')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition opacity-70 hover:opacity-100" data-target="tab-informes"><i class="fa-solid fa-file-pdf mr-2"></i>Generador PDF</button>
+        </nav>
+
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid gap-6">
+            <!-- 1. ANALIZADOR -->
+            <section id="tab-analizador" class="tab-content grid gap-4">
+                <div class="cyber-card p-6 rounded-2xl border shadow-lg">
+                    <h2 class="text-xl font-bold mb-2 flex items-center gap-2 text-emerald-400"><i class="fa-solid fa-code"></i> Analizador Legal de Código y Web</h2>
+                    <p class="text-sm opacity-80 mb-4">Inserta código fuente para auditoría estática y obtención de parches seguros.</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <textarea id="code-input" rows="8" placeholder="Ej: $id = $_GET['id']; $q = 'SELECT * FROM users WHERE id = ' . $id;" class="w-full p-3 rounded-lg border font-mono text-xs focus:outline-none focus:border-emerald-400"></textarea>
+                            <button onclick="runCodeAnalysis()" class="mt-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-4 py-2 rounded-lg text-sm transition shadow-md w-full">Analizar Vulnerabilidades</button>
+                        </div>
+                        <div>
+                            <div id="code-output" class="p-3 rounded-lg border font-mono text-xs h-[215px] overflow-y-auto bg-black/40"><span class="opacity-50">Esperando código...</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. ARSENAL -->
+            <section id="tab-arsenal" class="tab-content hidden grid gap-4">
+                <div class="cyber-card p-6 rounded-2xl border shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-cyan-400"><i class="fa-solid fa-toolbox"></i> Arsenal de Comandos</h2>
+                        <button onclick="openCustomCommandModal()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-4 py-2 rounded-lg text-sm"><i class="fa-solid fa-plus mr-1"></i> Añadir</button>
+                    </div>
+                    <div id="arsenal-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+            </section>
+
+            <!-- 3. CYBERCHEF -->
+            <section id="tab-cyberchef" class="tab-content hidden grid gap-4">
+                <div class="cyber-card p-6 rounded-2xl border shadow-lg">
+                    <h2 class="text-xl font-bold mb-2 text-purple-400"><i class="fa-solid fa-wand-magic-sparkles"></i> CyberChef Local</h2>
+                    <textarea id="chef-input" rows="3" oninput="runCyberChef()" placeholder="Texto..." class="w-full p-3 rounded-lg border font-mono text-xs mb-3"></textarea>
+                    <div class="grid sm:grid-cols-4 gap-2 mb-3">
+                        <button onclick="setChefOp('b64e')" class="p-2 border text-xs rounded">Base64 Enc</button>
+                        <button onclick="setChefOp('b64d')" class="p-2 border text-xs rounded">Base64 Dec</button>
+                        <button onclick="setChefOp('urle')" class="p-2 border text-xs rounded">URL Enc</button>
+                        <button onclick="setChefOp('hash')" class="p-2 border text-xs rounded">Hash MD5/SHA</button>
+                    </div>
+                    <textarea id="chef-output" rows="3" readonly class="w-full p-3 rounded-lg border font-mono text-xs bg-black/40"></textarea>
+                </div>
+            </section>
+
+            <!-- 4. REDES -->
+            <section id="tab-redes" class="tab-content hidden grid gap-4">
+                <div class="cyber-card p-6 rounded-2xl border shadow-lg">
+                    <h2 class="text-xl font-bold mb-2 text-emerald-400"><i class="fa-solid fa-network-wired"></i> Subnetting Avanzado</h2>
+                    <div class="grid sm:grid-cols-3 gap-4 mb-4">
+                        <input type="text" id="subnet-ip" value="192.168.1.0" class="px-3 py-2 border text-sm font-mono">
+                        <select id="subnet-cidr" class="px-3 py-2 border text-sm font-mono">
+                            <option value="24">/24 (254 hosts)</option>
+                            <option value="25">/25 (126 hosts)</option>
+                            <option value="26">/26 (62 hosts)</option>
+                            <option value="28">/28 (14 hosts)</option>
+                        </select>
+                        <button onclick="calculateSubnet()" class="bg-emerald-500 text-black font-bold py-2 rounded text-sm">Calcular</button>
+                    </div>
+                    <div id="subnet-results" class="grid md:grid-cols-3 gap-2 mb-4"></div>
+                    <table class="w-full text-left border-collapse text-xs font-mono">
+                        <thead><tr class="border-b border-gray-700"><th class="p-2">#</th><th class="p-2">Red</th><th class="p-2">Rango Utilizable</th><th class="p-2">Broadcast</th></tr></thead>
+                        <tbody id="subnet-table-body"><tr><td colspan="4" class="p-4 text-center opacity-50">Calcula una subred.</td></tr></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 5. CTF -->
+            <section id="tab-ctf" class="tab-content hidden grid gap-4">
+                <div class="cyber-card p-6 rounded-2xl border shadow-lg">
+                    <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-amber-400">Laboratorio CTF Progresivo</h2><span id="ctf-score" class="text-xs bg-amber-500/20 text-amber-400 px-3 py-1 rounded border">XP: 0</span></div>
+                    <div id="ctf-list" class="grid gap-3"></div>
+                </div>
+            </section>
+
+            <!-- 6. INFORMES PDF -->
+            <section id="tab-informes" class="tab-content hidden grid gap-4">
+                <div class="cyber-card p-6 rounded-2xl border shadow-lg">
+                    <h2 class="text-xl font-bold mb-2 text-cyan-400">Generador de Informes Formales PDF</h2>
+                    <input type="text" id="rep-client" placeholder="Empresa Cliente" class="w-full px-3 py-2 border text-sm mb-3">
+                    <textarea id="rep-sum" rows="4" placeholder="Resumen de vulnerabilidades..." class="w-full p-3 border text-xs mb-3"></textarea>
+                    <button onclick="generatePDFReport()" class="bg-cyan-600 text-white font-bold px-6 py-2 rounded text-sm"><i class="fa-solid fa-download mr-2"></i> Descargar PDF</button>
+                </div>
+            </section>
+        </main>
+        <footer class="cyber-card border-t text-center py-4 text-xs opacity-70">CyberNexus Pro Ultimate © 2026</footer>
+    </div>
+
+    <!-- MODAL CUSTOM COMMAND -->
+    <div id="modal-cmd" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 hidden">
+        <div class="cyber-card p-6 rounded-2xl w-full max-w-md border">
+            <h3 class="font-bold mb-3 text-cyan-400">Añadir Comando</h3>
+            <input type="text" id="nc-name" placeholder="Nombre" class="w-full px-3 py-2 border text-sm mb-2">
+            <input type="text" id="nc-cat" placeholder="Categoría" class="w-full px-3 py-2 border text-sm mb-2">
+            <input type="text" id="nc-cmd" placeholder="Comando" class="w-full px-3 py-2 border text-sm mb-2 font-mono">
+            <textarea id="nc-desc" placeholder="Descripción" class="w-full px-3 py-2 border text-sm mb-3"></textarea>
+            <div class="flex justify-end gap-2"><button onclick="document.getElementById('modal-cmd').classList.add('hidden')" class="px-3 py-1 border text-sm">Cancelar</button><button onclick="saveCmd()" class="bg-cyan-600 text-white px-3 py-1 rounded text-sm">Guardar</button></div>
+        </div>
+    </div>
+
+    <script>
+        let supabaseClient = null;
+        let arsenal = [
+            {name: 'Nmap Scan', category: 'Reconocimiento', command: 'nmap -sV -sC <target>', description: 'Detección de versiones y scripts.'},
+            {name: 'Gobuster Dir', category: 'Web', command: 'gobuster dir -u http://<target> -w wordlist.txt', description: 'Fuzzing de directorios.'}
+        ];
+        let ctf = [
+            {id:1, title: 'Nivel 1: Headers', desc: 'Identifica faltas en cabeceras de seguridad.', xp: 100, solved: false, flag: 'CTF{head_ok}'},
+            {id:2, title: 'Nivel 2: SQLi Auth Bypass', desc: 'Bypass de panel de acceso mediante inyección.', xp: 150, solved: false, flag: 'CTF{sql_pass}'}
+        ];
+
+        document.getElementById('auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const u = document.getElementById('supabase-url').value.trim();
+            const k = document.getElementById('supabase-key').value.trim();
+            const email = document.getElementById('auth-email').value.trim();
+            const pass = document.getElementById('auth-password').value.trim();
+            try {
+                supabaseClient = supabase.createClient(u, k);
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+                if (error) throw error;
+                unlockApp(email);
+            } catch (err) {
+                document.getElementById('auth-error').textContent = "Error: " + err.message;
+                document.getElementById('auth-error').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('btn-signup').addEventListener('click', async () => {
+            const u = document.getElementById('supabase-url').value.trim();
+            const k = document.getElementById('supabase-key').value.trim();
+            const email = document.getElementById('auth-email').value.trim();
+            const pass = document.getElementById('auth-password').value.trim();
+            try {
+                supabaseClient = supabase.createClient(u, k);
+                const { error } = await supabaseClient.auth.signUp({ email, password: pass });
+                if (error) throw error;
+                alert("¡Registrado! Ya puedes iniciar sesión.");
+            } catch (err) {
+                document.getElementById('auth-error').textContent = "Error: " + err.message;
+                document.getElementById('auth-error').classList.remove('hidden');
+            }
+        });
+
+        function unlockApp(email) {
+            document.getElementById('auth-modal').classList.add('hidden');
+            const app = document.getElementById('app-container');
+            app.classList.remove('opacity-30', 'pointer-events-none', 'filter', 'blur-sm');
+            document.getElementById('current-user-email').textContent = email;
+            renderArsenal();
+            renderCTF();
+        }
+
+        function logoutSupabase() { location.reload(); }
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); }
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('bg-emerald-500', 'text-black'); b.classList.add('opacity-70'); });
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelector(`[data-target="${id}"]`).classList.add('bg-emerald-500', 'text-black');
+            document.querySelector(`[data-target="${id}"]`).classList.remove('opacity-70');
+        }
+
+        function runCodeAnalysis() {
+            const code = document.getElementById('code-input').value;
+            const out = document.getElementById('code-output');
+            if(code.includes('$_GET') || code.includes('SELECT')) {
+                out.innerHTML = `<span class="text-red-400 font-bold">[!] SQL Injection detectada.</span><br><br><span class="text-emerald-400">PARCHE:</span> Usa Prepared Statements con PDO.`;
+            } else {
+                out.innerHTML = `<span class="text-emerald-400">[✓] Sin vulnerabilidades críticas aparentes.</span>`;
+            }
+        }
+
+        function renderArsenal() {
+            const grid = document.getElementById('arsenal-grid');
+            grid.innerHTML = '';
+            arsenal.forEach(i => {
+                grid.innerHTML += `<div class="cyber-card p-4 rounded-xl border flex flex-col justify-between"><div><h3 class="font-bold text-sm">${i.name}</h3><span class="text-[10px] text-cyan-400">${i.category}</span><p class="text-xs opacity-80 mt-1">${i.description}</p></div><div class="p-2 bg-black/50 font-mono text-xs my-2 text-emerald-400">${i.command}</div><button onclick="navigator.clipboard.writeText('${i.command}');alert('Copiado');" class="py-1 bg-cyan-600/20 text-cyan-300 text-xs rounded border border-cyan-500/30">Copiar</button></div>`;
+            });
+        }
+        function openCustomCommandModal() { document.getElementById('modal-cmd').classList.remove('hidden'); }
+        function saveCmd() {
+            arsenal.push({name: document.getElementById('nc-name').value, category: document.getElementById('nc-cat').value, command: document.getElementById('nc-cmd').value, description: document.getElementById('nc-desc').value});
+            renderArsenal();
+            document.getElementById('modal-cmd').classList.add('hidden');
+        }
+
+        function setChefOp(op) {
+            const val = document.getElementById('chef-input').value;
+            const out = document.getElementById('chef-output');
+            if(op === 'b64e') out.value = btoa(val);
+            if(op === 'b64d') { try{out.value = atob(val);}catch(e){out.value='Error';} }
+            if(op === 'urle') out.value = encodeURIComponent(val);
+            if(op === 'hash') out.value = "MD5: " + btoa(val).substring(0,16);
+        }
+        function runCyberChef() { setChefOp('b64e'); }
+
+        function calculateSubnet() {
+            const ip = document.getElementById('subnet-ip').value;
+            const cidr = parseInt(document.getElementById('subnet-cidr').value);
+            document.getElementById('subnet-results').innerHTML = `<div class="p-2 border bg-black/20 text-xs">IP: ${ip}</div><div class="p-2 border bg-black/20 text-xs">CIDR: /${cidr}</div><div class="p-2 border bg-black/20 text-xs text-emerald-400">Hosts: ${Math.pow(2, 32-cidr)-2}</div>`;
+            const tbody = document.getElementById('subnet-table-body');
+            tbody.innerHTML = '';
+            let p = ip.split('.').map(Number);
+            for(let i=0; i<4; i++) {
+                tbody.innerHTML += `<tr class="border-b border-gray-800"><td class="p-2 text-emerald-400">Subred #${i+1}</td><td class="p-2">${p[0]}.${p[1]}.${p[2]}.${i*64}</td><td class="p-2">${p[0]}.${p[1]}.${p[2]}.${(i*64)+1} - ${p[0]}.${p[1]}.${p[2]}.${((i+1)*64)-2}</td><td class="p-2">${p[0]}.${p[1]}.${p[2]}.${((i+1)*64)-1}</td></tr>`;
+            }
+        }
+
+        function renderCTF() {
+            const list = document.getElementById('ctf-list');
+            list.innerHTML = '';
+            let xp = 0;
+            ctf.forEach((c, idx) => {
+                if(c.solved) xp += c.xp;
+                const locked = idx > 0 && !ctf[idx-1].solved;
+                list.innerHTML += `<div class="cyber-card p-4 rounded-xl border flex justify-between items-center ${locked?'opacity-50':''}"><div><h3 class="font-bold text-sm">${c.title}</h3><p class="text-xs opacity-80">${c.desc}</p></div>${!c.solved && !locked ? `<div class="flex gap-2"><input type="text" id="f-${c.id}" placeholder="Flag" class="px-2 border text-xs"><button onclick="checkF(${c.id})" class="bg-amber-500 text-black px-3 py-1 rounded text-xs font-bold">Validar</button></div>` : '<span class="text-xs text-emerald-400 font-bold">Completado</span>'}</div>`;
+            });
+            document.getElementById('ctf-score').textContent = `XP: ${xp}`;
+        }
+        function checkF(id) {
+            const val = document.getElementById(`f-${id}`).value.trim();
+            const ch = ctf.find(x => x.id === id);
+            if(val === ch.flag) { alert("¡Correcto!"); ch.solved = true; renderCTF(); } else { alert("Incorrecto"); }
+        }
+
+        function generatePDFReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("INFORME DE PENTESTING", 20, 20);
+            doc.text("Cliente: " + (document.getElementById('rep-client').value || 'N/D'), 20, 30);
+            doc.text(document.getElementById('rep-sum').value || 'Sin resumen', 20, 40);
+            doc.save("Informe_CyberNexus.pdf");
+        }
+    </script>
+</body>
+</html>
